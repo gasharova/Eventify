@@ -1,6 +1,9 @@
-﻿using Eventify.Models;
+﻿using AutoMapper;
+using Eventify.DTOs.Event;
+using Eventify.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,25 +16,36 @@ namespace Eventify.Services.EventService
             new Event { Id = 1, Name = "Event1" }
         };
 
-        public async Task<ServiceResponse<List<Event>>> AddEvent(Event newEvent)
+        private readonly IMapper _mapper;
+
+        public EventService(IMapper mapper)
         {
-            ServiceResponse<List<Event>> serviceResponse = new ServiceResponse<List<Event>>();
-            events.Add(newEvent);
-            serviceResponse.Data = events;
+            _mapper = mapper;
+        }
+
+        public async Task<ServiceResponse<List<GetEventDTO>>> AddEvent(AddEventDTO newEvent)
+        {
+            ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
+
+            Event e = _mapper.Map<Event>(newEvent);
+            e.Id = events.Max(e => e.Id) + 1;
+            events.Add(e);
+
+            serviceResponse.Data = (events.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Event>>> GetAllEvents()
+        public async Task<ServiceResponse<List<GetEventDTO>>> GetAllEvents()
         {
-            ServiceResponse<List<Event>> serviceResponse = new ServiceResponse<List<Event>>();
-            serviceResponse.Data = events;
+            ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
+            serviceResponse.Data = (events.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Event>> GetEventById(int id)
+        public async Task<ServiceResponse<GetEventDTO>> GetEventById(int id)
         {
-            ServiceResponse<Event> serviceResponse = new ServiceResponse<Event>();
-            serviceResponse.Data = events.FirstOrDefault(c => c.Id == id);
+            ServiceResponse<GetEventDTO> serviceResponse = new ServiceResponse<GetEventDTO>();
+            serviceResponse.Data = _mapper.Map<GetEventDTO>(events.FirstOrDefault(c => c.Id == id));
             return serviceResponse;
         }
     }

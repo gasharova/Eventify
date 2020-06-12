@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Eventify.DTOs.Event;
 using Eventify.Models;
 using Eventify.Services.EventService;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace Eventify.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddEvent(Event e)
+        public async Task<IActionResult> AddEvent(AddEventDTO e)
         {
             return Ok(_eventService.AddEvent(e));
         }
