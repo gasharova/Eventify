@@ -8,8 +8,8 @@ namespace Eventify.Services.EventService
 {
     public interface IEventService
     {
-        Task<List<Event>> GetAllEvents();
-        Task<Event> GetEventById(int id);
-        Task<List<Event>> AddEvent(Event newEvent);
+        Task<ServiceResponse<List<Event>>> GetAllEvents();
+        Task<ServiceResponse<Event>> GetEventById(int id);
+        Task<ServiceResponse<List<Event>>> AddEvent(Event newEvent);
     }
 }

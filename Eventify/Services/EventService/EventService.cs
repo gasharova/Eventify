@@ -13,20 +13,26 @@ namespace Eventify.Services.EventService
             new Event { Id = 1, Name = "Event1" }
         };
 
-        public async Task<List<Event>> AddEvent(Event newEvent)
+        public async Task<ServiceResponse<List<Event>>> AddEvent(Event newEvent)
         {
+            ServiceResponse<List<Event>> serviceResponse = new ServiceResponse<List<Event>>();
             events.Add(newEvent);
-            return events;
+            serviceResponse.Data = events;
+            return serviceResponse;
         }
 
-        public async Task<List<Event>> GetAllEvents()
+        public async Task<ServiceResponse<List<Event>>> GetAllEvents()
         {
-            return events;
+            ServiceResponse<List<Event>> serviceResponse = new ServiceResponse<List<Event>>();
+            serviceResponse.Data = events;
+            return serviceResponse;
         }
 
-        public async Task<Event> GetEventById(int id)
+        public async Task<ServiceResponse<Event>> GetEventById(int id)
         {
-            return events.FirstOrDefault(c => c.Id == id);
+            ServiceResponse<Event> serviceResponse = new ServiceResponse<Event>();
+            serviceResponse.Data = events.FirstOrDefault(c => c.Id == id);
+            return serviceResponse;
         }
     }
 }
