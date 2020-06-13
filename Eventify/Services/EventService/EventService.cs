@@ -22,18 +22,6 @@ namespace Eventify.Services.EventService
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<List<GetEventDTO>>> AddEvent(AddEventDTO newEvent)
-        {
-            ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
-            Event e = _mapper.Map<Event>(newEvent);
-
-            await _context.Events.AddAsync(e);
-            await _context.SaveChangesAsync();
-
-            serviceResponse.Data = (_context.Events.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
-            return serviceResponse;
-        }
-
         public async Task<ServiceResponse<List<GetEventDTO>>> GetAllEvents()
         {
             ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
@@ -49,6 +37,19 @@ namespace Eventify.Services.EventService
             serviceResponse.Data = _mapper.Map<GetEventDTO>(dbEvent);
             return serviceResponse;
         }
+
+        public async Task<ServiceResponse<List<GetEventDTO>>> AddEvent(AddEventDTO newEvent)
+        {
+            ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
+            Event e = _mapper.Map<Event>(newEvent);
+
+            await _context.Events.AddAsync(e);
+            await _context.SaveChangesAsync();
+
+            serviceResponse.Data = (_context.Events.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
+            return serviceResponse;
+        }
+
         public async Task<ServiceResponse<GetEventDTO>> UpdateEvent(UpdateEventDTO updatedEvent)
         {
             ServiceResponse<GetEventDTO> serviceResponse = new ServiceResponse<GetEventDTO>();
