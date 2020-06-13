@@ -5,6 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200613111628_AddUser.cs" />
+    <Compile Remove="Migrations\20200613111628_AddUser.Designer.cs" />
+    <Compile Remove="Migrations\20200613111719_AddUser.cs" />
+    <Compile Remove="Migrations\20200613111719_AddUser.Designer.cs" />
+    <Compile Remove="Migrations\20200613112405_AddUserToEventRelationship.cs" />
+    <Compile Remove="Migrations\20200613112405_AddUserToEventRelationship.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5">
