@@ -36,5 +36,28 @@ namespace Eventify.Controllers
         {
             return Ok(_eventService.AddEvent(e));
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateEvent(UpdateEventDTO e)
+        {
+            ServiceResponse<GetEventDTO> response = await _eventService.UpdateEvent(e);
+            if (response.Data == null)
+            {
+                return NotFound(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteEvent(int id)
+        {
+            ServiceResponse<GetEventDTO> response = await _eventService.DeleteEvent(id);
+            if (response.Data == null)
+            {
+                return NotFound(response);
+            }
+
+            return Ok(response);
+        }
     }
 }

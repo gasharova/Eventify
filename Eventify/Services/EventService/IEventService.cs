@@ -12,5 +12,7 @@ namespace Eventify.Services.EventService
         Task<ServiceResponse<List<GetEventDTO>>> GetAllEvents();
         Task<ServiceResponse<GetEventDTO>> GetEventById(int id);
         Task<ServiceResponse<List<GetEventDTO>>> AddEvent(AddEventDTO newEvent);
+        Task<ServiceResponse<GetEventDTO>> UpdateEvent(UpdateEventDTO updatedEvent);
+        Task<ServiceResponse<GetEventDTO>> DeleteEvent(int id);
     }
 }
