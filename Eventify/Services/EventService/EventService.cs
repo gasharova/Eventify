@@ -49,6 +49,13 @@ namespace Eventify.Services.EventService
             Event e = _mapper.Map<Event>(newEvent);
             e.User = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
             e.EventDate = DateTime.Now;
+            e.IsDeleted = false;
+            if(e.NumberOfAttendees == 0)
+            {
+                serviceResponse.Success = false;
+                serviceResponse.Message = "Please enter sufficient data. Number of attendees is missing.";
+                return serviceResponse;
+            }
 
             await _context.Events.AddAsync(e);
             await _context.SaveChangesAsync();
@@ -65,14 +72,20 @@ namespace Eventify.Services.EventService
             {
                 Event e = await _context.Events.Where(e => e.IsDeleted == false).
                     Include(ev => ev.User).FirstOrDefaultAsync(ev => ev.Id == updatedEvent.Id);
+
                 if (e.User.Id == GetUserId())
                 {
                     e.Name = updatedEvent.Name;
-                    e.EventDate = updatedEvent.EventDate;
                     e.Location = updatedEvent.Location;
-                    e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
-                    e.User = updatedEvent.User;
-                    e.IsDeleted = updatedEvent.IsDeleted;
+
+                    if (updatedEvent.EventDate != null)
+                        e.EventDate = updatedEvent.EventDate;
+                    if (updatedEvent.NumberOfAttendees != 0)
+                        e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
+                    if (updatedEvent.User != null)
+                        e.User = updatedEvent.User;
+                    if (updatedEvent.IsDeleted != true)
+                        e.IsDeleted = updatedEvent.IsDeleted;
 
                     _context.Events.Update(e);
                     await _context.SaveChangesAsync();
@@ -88,7 +101,7 @@ namespace Eventify.Services.EventService
             catch(Exception exc)
             {
                 serviceResponse.Success = false;
-                serviceResponse.Message = "No such record. Check id.";
+                serviceResponse.Message = exc.Message;
             }
 
             return serviceResponse;
