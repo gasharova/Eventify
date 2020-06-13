@@ -70,10 +70,10 @@ namespace Eventify.Services.EventService
 
                 serviceResponse.Data = _mapper.Map<GetEventDTO>(e);
             }
-            catch(NullReferenceException exc)
+            catch(Exception exc)
             {
                 serviceResponse.Success = false;
-                serviceResponse.Message = exc.Message;
+                serviceResponse.Message = "No such record. Check id.";
             }
 
             return serviceResponse;
@@ -91,7 +91,7 @@ namespace Eventify.Services.EventService
             catch(Exception exc)
             {
                 serviceResponse.Success = false;
-                serviceResponse.Message = exc.Message;
+                serviceResponse.Message = "No such record. Check id.";
             }
             return serviceResponse;
         }
