@@ -14,6 +14,6 @@ namespace Eventify.DTOs.Event
         public string Location { get; set; }
         public int NumberOfAttendees { get; set; }
         public bool IsActive { get; set; }
-        public User User { get; set; }
+        public Eventify.Models.User User { get; set; }
     }
 }
