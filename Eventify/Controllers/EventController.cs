@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Eventify.DTOs.Event;
 using Eventify.Models;
 using Eventify.Services.EventService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eventify.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [Authorize]
     public class EventController : ControllerBase
     {
         private static Event e = new Event();
