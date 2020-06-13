@@ -20,13 +20,25 @@ namespace Eventify.Controllers
             _authRepo = authRepository;
         }
 
-        [HttpPost]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(AddUserDTO request)
         {
             ServiceResponse<int> response = await _authRepo.Register(
                 new User { Username = request.Username },
                 request.Password
             );
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginUserDTO request)
+        {
+            ServiceResponse<string> response = await _authRepo.Login(
+                request.Username, request.Password);
             if (!response.Success)
             {
                 return BadRequest(response);
