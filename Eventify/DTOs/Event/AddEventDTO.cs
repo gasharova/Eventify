@@ -10,7 +10,7 @@ namespace Eventify.DTOs.Event
     {
         public string Name { get; set; }
         public DateTime EventDate { get; set; }
-        public string Location { get; set; }
+        public Eventify.Models.Location Location { get; set; }
         public int NumberOfAttendees { get; set; }
         public bool IsDeleted { get; set; }
         public Eventify.Models.User User { get; set; }

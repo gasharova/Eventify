@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Eventify.DTOs.Event;
+using Eventify.DTOs.Location;
 using Eventify.Models;
 
 namespace Eventify
@@ -14,6 +15,8 @@ namespace Eventify
         {
             CreateMap<Event, GetEventDTO>();
             CreateMap<AddEventDTO, Event>();
+            CreateMap<Location, GetLocationDTO>();
+            CreateMap<AddLocationDTO, Location>();
         }
     }
 }

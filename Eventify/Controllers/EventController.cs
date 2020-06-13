@@ -15,7 +15,6 @@ namespace Eventify.Controllers
     [Authorize]
     public class EventController : ControllerBase
     {
-        private static Event e = new Event();
         private readonly IEventService _eventService;
 
         public EventController(IEventService eventService)

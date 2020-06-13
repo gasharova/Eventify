@@ -7,6 +7,7 @@ using AutoMapper;
 using Eventify.Data;
 using Eventify.Data.Auth;
 using Eventify.Services.EventService;
+using Eventify.Services.LocationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,6 +41,7 @@ namespace Eventify
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<ILocationService, LocationService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

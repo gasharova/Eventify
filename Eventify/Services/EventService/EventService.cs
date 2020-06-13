@@ -29,9 +29,8 @@ namespace Eventify.Services.EventService
         public async Task<ServiceResponse<List<GetEventDTO>>> GetAllEvents()
         {
             ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
-            List<Event> dbEvents = await _context.Events.ToListAsync();
-            serviceResponse.Data = (dbEvents.Select(e => _mapper.Map<GetEventDTO>(e))).
-                Where(e => e.IsDeleted == false).ToList();
+            List<Event> dbEvents = await _context.Events.Where(e => e.IsDeleted == false).ToListAsync();
+            serviceResponse.Data = (dbEvents.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
             return serviceResponse;
         }
 
@@ -84,8 +83,6 @@ namespace Eventify.Services.EventService
                         e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
                     if (updatedEvent.User != null)
                         e.User = updatedEvent.User;
-                    if (updatedEvent.IsDeleted != true)
-                        e.IsDeleted = updatedEvent.IsDeleted;
 
                     _context.Events.Update(e);
                     await _context.SaveChangesAsync();

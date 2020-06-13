@@ -6,19 +6,16 @@ using System.Threading.Tasks;
 
 namespace Eventify.Models
 {
-    public class Event
+    public class Location
     {
         [Key]
         public int Id { get; set; }
-        public string Name { get; set; }
         [Required]
-        public DateTime EventDate { get; set; }
-        public Location Location { get; set; }
+        public int Capacity { get; set; }
+        public double SquareMeters { get; set; }
         [Required]
-        public int NumberOfAttendees { get; set; }
-        [Required]
+        public string Address { get; set; }
         public bool IsDeleted { get; set; }
-        [Required]
-        public User User { get; set; }
+        public List<Event> Events { get; set; }
     }
 }
