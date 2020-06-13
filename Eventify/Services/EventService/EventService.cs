@@ -121,6 +121,7 @@ namespace Eventify.Services.EventService
             return serviceResponse;
         }
 
+        // current user id
         private int GetUserId() =>
             int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
     }

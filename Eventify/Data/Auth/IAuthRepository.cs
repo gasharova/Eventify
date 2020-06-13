@@ -10,6 +10,7 @@ namespace Eventify.Data.Auth
     {
         Task<ServiceResponse<int>> Register(User user, string password);
         Task<ServiceResponse<string>> Login(string username, string password);
+        Task<ServiceResponse<int>> Delete(int id);
         Task<bool> UserExists(string username);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Eventify.Data.Auth;
 using Eventify.DTOs.User;
@@ -39,6 +40,17 @@ namespace Eventify.Controllers
         {
             ServiceResponse<string> response = await _authRepo.Login(
                 request.Username, request.Password);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            ServiceResponse<int> response = await _authRepo.Delete(id);
             if (!response.Success)
             {
                 return BadRequest(response);

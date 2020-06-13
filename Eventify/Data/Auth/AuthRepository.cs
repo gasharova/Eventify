@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace Eventify.Data.Auth
 {
@@ -17,8 +18,10 @@ namespace Eventify.Data.Auth
         private readonly DataContext _context;
 
         private readonly IConfiguration _configuration;
-        public AuthRepository(DataContext context, IConfiguration configuration)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthRepository(DataContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
+            _httpContextAccessor = httpContextAccessor;
             _configuration = configuration;
             _context = context;
         }
@@ -26,7 +29,8 @@ namespace Eventify.Data.Auth
         public async Task<ServiceResponse<string>> Login(string username, string password)
         {
             ServiceResponse<string> response = new ServiceResponse<string>();
-            User user = await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
+            User user = await _context.Users.Where(u => u.IsDeleted == false)
+                .FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username.ToLower()));
             if (user == null)
             {
                 response.Success = false;
@@ -63,9 +67,39 @@ namespace Eventify.Data.Auth
             return response;
         }
 
+        public async Task<ServiceResponse<int>> Delete(int id)
+        {
+            ServiceResponse<int> response = new ServiceResponse<int>();
+            
+            User u = await _context.Users.Where(u => u.IsDeleted == false)
+                    .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (u == null)
+            {
+                response.Success = false;
+                response.Message = "User does not exist.";
+                return response;
+            }
+
+            if (u.Id == GetUserId())
+            {
+                u.IsDeleted = true;
+                _context.Users.Update(u);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                response.Success = false;
+                response.Message = "You do not have the permissions to delete this user. Only the user themselves can.";
+            }
+
+            return response;
+        }
+
         public async Task<bool> UserExists(string username)
         {
-            if (await _context.Users.AnyAsync(x => x.Username.ToLower() == username.ToLower()))
+            if (await _context.Users.Where(u => u.IsDeleted == false)
+                .AnyAsync(x => x.Username.ToLower() == username.ToLower()))
             {
                 return true;
             }
@@ -118,5 +152,9 @@ namespace Eventify.Data.Auth
             SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
+        // current user id
+        private int GetUserId() =>
+            int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
     }
 }
