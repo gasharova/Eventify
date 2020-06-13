@@ -2,11 +2,13 @@
 using Eventify.Data;
 using Eventify.DTOs.Event;
 using Eventify.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Eventify.Services.EventService
@@ -16,8 +18,10 @@ namespace Eventify.Services.EventService
         private readonly IMapper _mapper;
 
         private readonly DataContext _context;
-        public EventService(IMapper mapper, DataContext context)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public EventService(IMapper mapper, DataContext context, IHttpContextAccessor httpContextAccessor)
         {
+            _httpContextAccessor = httpContextAccessor;
             _context = context;
             _mapper = mapper;
         }
@@ -42,6 +46,7 @@ namespace Eventify.Services.EventService
         {
             ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
             Event e = _mapper.Map<Event>(newEvent);
+            e.User = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
 
             await _context.Events.AddAsync(e);
             await _context.SaveChangesAsync();
@@ -56,19 +61,26 @@ namespace Eventify.Services.EventService
 
             try
             {
-                Event e = await _context.Events.FirstOrDefaultAsync(ev => ev.Id == updatedEvent.Id);
+                Event e = await _context.Events.Include(ev => ev.User).FirstOrDefaultAsync(ev => ev.Id == updatedEvent.Id);
+                if (e.User.Id == GetUserId())
+                {
+                    e.Name = updatedEvent.Name;
+                    e.EventDate = updatedEvent.EventDate;
+                    e.Location = updatedEvent.Location;
+                    e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
+                    e.User = updatedEvent.User;
+                    e.IsDeleted = updatedEvent.IsActive;
 
-                e.Name = updatedEvent.Name;
-                e.EventDate = updatedEvent.EventDate;
-                e.Location = updatedEvent.Location;
-                e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
-                e.User = updatedEvent.User;
-                e.IsDeleted = updatedEvent.IsActive;
+                    _context.Events.Update(e);
+                    await _context.SaveChangesAsync();
 
-                _context.Events.Update(e);
-                await _context.SaveChangesAsync();
-
-                serviceResponse.Data = _mapper.Map<GetEventDTO>(e);
+                    serviceResponse.Data = _mapper.Map<GetEventDTO>(e);
+                }
+                else
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "You do not have the permissions to edit this event. Only the creator of the event can update it.";
+                }
             }
             catch(Exception exc)
             {
@@ -95,5 +107,8 @@ namespace Eventify.Services.EventService
             }
             return serviceResponse;
         }
+
+        private int GetUserId() =>
+            int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
     }
 }
