@@ -63,7 +63,7 @@ namespace Eventify.Services.EventService
                 e.Location = updatedEvent.Location;
                 e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
                 e.CreatedBy = updatedEvent.CreatedBy;
-                e.IsActive = updatedEvent.IsActive;
+                e.IsDeleted = updatedEvent.IsActive;
 
                 _context.Events.Update(e);
                 await _context.SaveChangesAsync();

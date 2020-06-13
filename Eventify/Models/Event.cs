@@ -13,6 +13,6 @@ namespace Eventify.Models
         public string Location { get; set; }
         public int NumberOfAttendees { get; set; }
         public int CreatedBy { get; set; }
-        public bool IsActive { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
