@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Eventify.Data;
 using Eventify.DTOs.Event;
 using Eventify.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,41 +13,40 @@ namespace Eventify.Services.EventService
 {
     public class EventService : IEventService
     {
-        private static List<Event> events = new List<Event> {
-            new Event(),
-            new Event { Id = 1, Name = "Event1" }
-        };
-
         private readonly IMapper _mapper;
 
-        public EventService(IMapper mapper)
+        private readonly DataContext _context;
+        public EventService(IMapper mapper, DataContext context)
         {
+            _context = context;
             _mapper = mapper;
         }
 
         public async Task<ServiceResponse<List<GetEventDTO>>> AddEvent(AddEventDTO newEvent)
         {
             ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
-
             Event e = _mapper.Map<Event>(newEvent);
-            e.Id = events.Max(e => e.Id) + 1;
-            events.Add(e);
 
-            serviceResponse.Data = (events.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
+            await _context.Events.AddAsync(e);
+            await _context.SaveChangesAsync();
+
+            serviceResponse.Data = (_context.Events.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
             return serviceResponse;
         }
 
         public async Task<ServiceResponse<List<GetEventDTO>>> GetAllEvents()
         {
             ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
-            serviceResponse.Data = (events.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
+            List<Event> dbEvents = await _context.Events.ToListAsync();
+            serviceResponse.Data = (dbEvents.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
             return serviceResponse;
         }
 
         public async Task<ServiceResponse<GetEventDTO>> GetEventById(int id)
         {
             ServiceResponse<GetEventDTO> serviceResponse = new ServiceResponse<GetEventDTO>();
-            serviceResponse.Data = _mapper.Map<GetEventDTO>(events.FirstOrDefault(c => c.Id == id));
+            Event dbEvent = await _context.Events.FirstOrDefaultAsync(e => e.Id == id);
+            serviceResponse.Data = _mapper.Map<GetEventDTO>(dbEvent);
             return serviceResponse;
         }
         public async Task<ServiceResponse<GetEventDTO>> UpdateEvent(UpdateEventDTO updatedEvent)
@@ -54,7 +55,7 @@ namespace Eventify.Services.EventService
 
             try
             {
-                Event e = events.FirstOrDefault(ev => ev.Id == updatedEvent.Id);
+                Event e = await _context.Events.FirstOrDefaultAsync(ev => ev.Id == updatedEvent.Id);
 
                 e.Name = updatedEvent.Name;
                 e.EventDate = updatedEvent.EventDate;
@@ -62,6 +63,9 @@ namespace Eventify.Services.EventService
                 e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
                 e.CreatedBy = updatedEvent.CreatedBy;
                 e.IsActive = updatedEvent.IsActive;
+
+                _context.Events.Update(e);
+                await _context.SaveChangesAsync();
 
                 serviceResponse.Data = _mapper.Map<GetEventDTO>(e);
             }
@@ -79,8 +83,9 @@ namespace Eventify.Services.EventService
             ServiceResponse<GetEventDTO> serviceResponse = new ServiceResponse<GetEventDTO>();
             try
             {
-                Event e = events.First(ev => ev.Id == id);
-                events.Remove(e);
+                Event e = await _context.Events.FirstAsync(ev => ev.Id == id);
+                _context.Events.Remove(e);
+                await _context.SaveChangesAsync();
             }
             catch(Exception exc)
             {

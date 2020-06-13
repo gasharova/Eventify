@@ -26,15 +26,15 @@ namespace Eventify.Controllers
         {
             if (id != null)
             {
-                return Ok(_eventService.GetEventById(Int32.Parse(id)));
+                return Ok(await _eventService.GetEventById(Int32.Parse(id)));
             }
-            return Ok(_eventService.GetAllEvents());
+            return Ok(await _eventService.GetAllEvents());
         }
 
         [HttpPost]
         public async Task<IActionResult> AddEvent(AddEventDTO e)
         {
-            return Ok(_eventService.AddEvent(e));
+            return Ok(await _eventService.AddEvent(e));
         }
 
         [HttpPut]
