@@ -61,6 +61,7 @@ namespace Eventify.Data.Auth
             CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+            user.TimeCreated = DateTime.Now;
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
             response.Data = user.Id;

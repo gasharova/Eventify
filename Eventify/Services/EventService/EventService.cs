@@ -48,6 +48,7 @@ namespace Eventify.Services.EventService
             ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
             Event e = _mapper.Map<Event>(newEvent);
             e.User = await _context.Users.FirstOrDefaultAsync(u => u.Id == GetUserId());
+            e.EventDate = DateTime.Now;
 
             await _context.Events.AddAsync(e);
             await _context.SaveChangesAsync();
