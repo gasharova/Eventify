@@ -30,14 +30,15 @@ namespace Eventify.Services.EventService
         {
             ServiceResponse<List<GetEventDTO>> serviceResponse = new ServiceResponse<List<GetEventDTO>>();
             List<Event> dbEvents = await _context.Events.ToListAsync();
-            serviceResponse.Data = (dbEvents.Select(e => _mapper.Map<GetEventDTO>(e))).ToList();
+            serviceResponse.Data = (dbEvents.Select(e => _mapper.Map<GetEventDTO>(e))).
+                Where(e => e.IsDeleted == false).ToList();
             return serviceResponse;
         }
 
         public async Task<ServiceResponse<GetEventDTO>> GetEventById(int id)
         {
             ServiceResponse<GetEventDTO> serviceResponse = new ServiceResponse<GetEventDTO>();
-            Event dbEvent = await _context.Events.FirstOrDefaultAsync(e => e.Id == id);
+            Event dbEvent = await _context.Events.Where(e => e.IsDeleted == false).FirstOrDefaultAsync(e => e.Id == id);
             serviceResponse.Data = _mapper.Map<GetEventDTO>(dbEvent);
             return serviceResponse;
         }
@@ -61,7 +62,8 @@ namespace Eventify.Services.EventService
 
             try
             {
-                Event e = await _context.Events.Include(ev => ev.User).FirstOrDefaultAsync(ev => ev.Id == updatedEvent.Id);
+                Event e = await _context.Events.Where(e => e.IsDeleted == false).
+                    Include(ev => ev.User).FirstOrDefaultAsync(ev => ev.Id == updatedEvent.Id);
                 if (e.User.Id == GetUserId())
                 {
                     e.Name = updatedEvent.Name;
@@ -69,7 +71,7 @@ namespace Eventify.Services.EventService
                     e.Location = updatedEvent.Location;
                     e.NumberOfAttendees = updatedEvent.NumberOfAttendees;
                     e.User = updatedEvent.User;
-                    e.IsDeleted = updatedEvent.IsActive;
+                    e.IsDeleted = updatedEvent.IsDeleted;
 
                     _context.Events.Update(e);
                     await _context.SaveChangesAsync();
@@ -96,9 +98,20 @@ namespace Eventify.Services.EventService
             ServiceResponse<GetEventDTO> serviceResponse = new ServiceResponse<GetEventDTO>();
             try
             {
-                Event e = await _context.Events.FirstAsync(ev => ev.Id == id);
-                _context.Events.Remove(e);
-                await _context.SaveChangesAsync();
+                Event e = await _context.Events.Where(e => e.IsDeleted == false)
+                    .Include(ev => ev.User).FirstAsync(ev => ev.Id == id);
+
+                if (e.User.Id == GetUserId())
+                {
+                    e.IsDeleted = true;
+                    _context.Events.Update(e);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    serviceResponse.Success = false;
+                    serviceResponse.Message = "You do not have the permissions to delete this event. Only the creator of the event can delete it.";
+                }
             }
             catch(Exception exc)
             {
