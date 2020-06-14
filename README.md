@@ -23,11 +23,11 @@
 - **_[DELETE]_ /auth?id=0000** - deletes user
 
 #### All other tables
-- **_[GET]_ /*<entity>*/** - returns all entities
-- **_[GET]_ /*<entity>*?id=0000** - searches for entity by id and returns it/null
-- **_[POST]_ /*<entity>* ** - Creates record for that entity. Takes request body
-- **_[PUT]_ /*<entity>* ** - Updates record for that entity. Takes request body
-- **_[DELETE]_ /*<entity>*?id=0000 ** - Deletes entity
+- **_[GET]_ /*\(entity)*/** - returns all entities
+- **_[GET]_ /*\(entity)*?id=0000** - searches for entity by id and returns it/null
+- **_[POST]_ /*\(entity>)* ** - Creates record for that entity. Takes request body
+- **_[PUT]_ /*\(entity)>* ** - Updates record for that entity. Takes request body
+- **_[DELETE]_ /*\(entity)*?id=0000 ** - Deletes entity
 
 ### Access
 - A user can get all entities
