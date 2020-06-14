@@ -11,6 +11,8 @@
     <Compile Remove="Migrations\20200613111719_AddUser.Designer.cs" />
     <Compile Remove="Migrations\20200613112405_AddUserToEventRelationship.cs" />
     <Compile Remove="Migrations\20200613112405_AddUserToEventRelationship.Designer.cs" />
+    <Compile Remove="Migrations\20200614044740_AddTicketDetailsTable.cs" />
+    <Compile Remove="Migrations\20200614044740_AddTicketDetailsTable.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -20,5 +20,6 @@ namespace Eventify.Models
         public bool IsDeleted { get; set; }
         [Required]
         public User User { get; set; }
+        public List<TicketDetails> Details { get; set; }
     }
 }
